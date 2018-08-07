@@ -7,6 +7,13 @@ async function main() {
   const fogAddress = await settings.getFogAddress();
   const cloudSettings = await settings.getCloudSettings();
   const cloudType = await settings.getCloudType();
+
+  try {
+    const connector = ConnectorFactory.getConnector(cloudType, cloudSettings);
+    console.log(connector.settings);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 main();
