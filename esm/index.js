@@ -1,5 +1,6 @@
 import Settings from 'data/Settings';
 import ConnectorFactory from 'network/ConnectorFactory';
+import FogConnection from 'network/FogConnection';
 
 const settings = new Settings();
 
@@ -11,6 +12,18 @@ async function main() {
 
   try {
     const connector = ConnectorFactory.create(cloudType, cloudSettings);
+    if (fogCredentials.uuid && fogCredentials.token) {
+      const fogConn = new FogConnection(
+        fogAddress.host,
+        fogAddress.port,
+        fogCredentials.uuid,
+        fogCredentials.token,
+      );
+      await fogConn.connect();
+      await connector.start();
+    } else {
+      throw Error('Missing uuid and token');
+    }
   } catch (err) {
     console.error(err);
   }
