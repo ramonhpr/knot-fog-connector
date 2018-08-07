@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 // Infrastructure
 import Settings from 'data/Settings';
+<<<<<<< 4ff738ddb4a611d8a59d25ac043cc5e7e99649f9
 import ConnectorFactory from 'infrastructure/ConnectorFactory';
 import FogConnection from 'infrastructure/FogConnection';
 import DeviceStore from 'infrastructure/DeviceStore';
@@ -11,6 +12,9 @@ import SubscribeToUpdatedData from 'interactors/SubscribeToUpdatedData';
 import SubscribeToRequestedData from 'interactors/SubscribeToRequestedData';
 import DevicesService from 'services/DevicesService';
 import DataService from 'services/DataService';
+=======
+import ConnectorFactory from 'network/ConnectorFactory';
+>>>>>>> Add ConnectorFactory to select the connector
 
 const settings = new Settings();
 
@@ -21,6 +25,7 @@ async function main() {
   const cloudType = await settings.getCloudType();
 
   try {
+<<<<<<< 4ff738ddb4a611d8a59d25ac043cc5e7e99649f9
     const cloudConnector = ConnectorFactory.getConnector(cloudType, cloudSettings);
     const fogConnection = new FogConnection(fogAddress, fogCredentials);
 
@@ -40,6 +45,9 @@ async function main() {
     await dataService.subscribeToRequested();
 
     setInterval(devicesService.update.bind(devicesService), 3000);
+=======
+    const connector = ConnectorFactory.create(cloudType, cloudSettings);
+>>>>>>> Add ConnectorFactory to select the connector
   } catch (err) {
     console.error(err);
   }
