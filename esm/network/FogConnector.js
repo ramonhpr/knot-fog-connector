@@ -27,12 +27,7 @@ function connect(hostname, port, uuid, token) {
 }
 
 function mapDevice(device) {
-  return {
-    id: device.id,
-    name: device.name,
-    status: device.status,
-    schema: device.schema,
-  };
+  return _.omit(device, ['uuid', '_id', 'owner', 'type', 'ipAddress', 'token', 'meshblu', 'discoverWhitelist', 'configureWhitelist']);
 }
 
 function getMyDevices(connection, uuid) {
