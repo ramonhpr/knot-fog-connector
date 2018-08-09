@@ -22,6 +22,8 @@ class UpdateDevices {
         id: device.id,
         name: device.name,
       });
+      await this.fogConnector.subscribe(device.id, 'config');
+      console.log(`device ${device.id} was added`);
     });
   }
 

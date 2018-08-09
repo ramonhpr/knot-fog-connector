@@ -5,7 +5,7 @@ class LoadDevices {
   }
 
   async execute() {
-    const devices = await this.cloudConnector.listDevices();
+    const devices = []; //await this.cloudConnector.listDevices();
     devices.map(async device => this.deviceStore.add(device));
   }
 }
