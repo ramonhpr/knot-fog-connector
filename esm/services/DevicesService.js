@@ -13,8 +13,8 @@ class DevicesService {
     await this.loadDevicesInteractor.execute();
   }
 
-  async updateProperties() {
-    await this.updateChangesInteractor.execute();
+  async updateProperties(device) {
+    await this.updateChangesInteractor.execute(device);
   }
 }
 

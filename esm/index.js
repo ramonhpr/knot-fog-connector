@@ -10,6 +10,7 @@ import UpdateDevices from 'interactors/UpdateDevices';
 import LoadDevices from 'interactors/LoadDevices';
 import UpdateChanges from 'interactors/UpdateChanges';
 import DevicesService from 'services/DevicesService';
+import _ from 'lodash';
 
 const settings = new Settings();
 const deviceStore = new DeviceStore();
@@ -38,17 +39,16 @@ async function main() {
     }
 
     const updateDevices = new UpdateDevices(deviceStore, fog, cloud);
-    const loadDevices = new LoadDevices(deviceStore, cloud);
+    const loadDevices = new LoadDevices(deviceStore, cloud, fog);
     const updateChanges = new UpdateChanges(deviceStore, cloud);
     const devicesService = new DevicesService(updateDevices, loadDevices, updateChanges);
 
     await devicesService.load();
 
     await fog.on('config', async (device) => {
-      const deviceMapped = _.omit(device, ['uuid', '_id', 'owner', 'type', 'ipAddress', 'token', 'meshblu', 'discoverWhitelist', 'configureWhitelist']);
-      console.log('---config---');
-      console.log(deviceMapped);
-      await devicesService.updateProperties();
+      if (_.has(device, 'id')) {
+        await devicesService.updateProperties(device);
+      }
     });
 
     setInterval(devicesService.update.bind(devicesService), 5000);

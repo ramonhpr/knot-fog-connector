@@ -6,8 +6,8 @@ class UpdateChanges {
     this.deviceStore = deviceStore;
   }
 
-  async execute() {
-    await this.updateDevicesChanges();
+  async execute(device) {
+    await this.updateDevicesChanges(device);
   }
 
   async difference(object, base) {
@@ -22,21 +22,20 @@ class UpdateChanges {
   }
 
   async updateDevicesChanges(device) {
-    const cloudDevices = await this.cloudConnector.listDevices();
-    const cloudDevice = _.find(cloudDevices, async (cloudDevice) => {
-      return cloudDevice.id === device.id;
-    });
+    const localDevices = await this.deviceStore.list();
+    if (device) {
+      const localDevice = _.find(localDevices, _localDevice => _localDevice.id === device.id);
 
-    const diff = await this.difference(device, cloudDevice);
-    console.log('diff');
-    console.log(diff);
-    if (!_.isEmpty(diff)) {
-      if (device.schema) {
-        if (device.schema.length > 0) {
-          await this.cloudConnector.updateSchema(device.id, device.schema);
+      const diff = await this.difference(device, localDevice);
+      if (!_.isEmpty(diff)) {
+        if (device.schema) {
+          if (device.schema.length > 0) {
+            await this.cloudConnector.updateSchema(device.id, device.schema);
+          }
+        } else {
+          await this.cloudConnector.updateProperties(diff);
         }
       }
-      await this.cloudConnector.updateProperties(diff);
     }
   }
 }
