@@ -22,7 +22,7 @@ async function main() {
   const cloudType = await settings.getCloudType();
 
   try {
-    const cloudConnector = ConnectorFactory.getConnector(cloudType, cloudSettings);
+    const cloudConnector = ConnectorFactory.create(cloudType, cloudSettings);
     let fogConnection;
     if (fogCredentials.uuid && fogCredentials.token) {
       fogConnection = new FogConnection(
@@ -44,11 +44,13 @@ async function main() {
     const dataService = new DataService(subscribeToUpdatedData, subscribeToRequestedData);
 
     await cloudConnector.start();
-    await fogConnection.start();
+    await fogConnection.connect();
 
     await dataService.subscribeToUpdated();
     await dataService.subscribeToRequested();
 
+
+    console.log('aqui oh')
     setInterval(devicesService.update.bind(devicesService), 3000);
   } catch (err) {
     console.error(err);
