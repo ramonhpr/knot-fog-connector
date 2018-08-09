@@ -8,6 +8,7 @@ import FogConnector from 'network/FogConnector';
 // Domain
 import UpdateDevices from 'interactors/UpdateDevices';
 import LoadDevices from 'interactors/LoadDevices';
+import UpdateChanges from 'interactors/UpdateChanges';
 import DevicesService from 'services/DevicesService';
 
 const settings = new Settings();
@@ -38,9 +39,11 @@ async function main() {
 
     const updateDevices = new UpdateDevices(deviceStore, fog, cloud);
     const loadDevices = new LoadDevices(deviceStore, cloud);
-    const devicesService = new DevicesService(updateDevices, loadDevices);
+    const updateChanges = new UpdateChanges(deviceStore, fog, cloud);
+    const devicesService = new DevicesService(updateDevices, loadDevices, updateChanges);
 
     await devicesService.load();
+    await devicesService.listen();
 
     setInterval(devicesService.update.bind(devicesService), 5000);
   } catch (err) {
