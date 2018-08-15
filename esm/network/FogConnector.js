@@ -215,12 +215,22 @@ class FogConnection {
       throw new Error('Not connected');
     }
 
-    this.connection.on(event, (device) => {
-      if (_.has(device, 'id')) { // Just device with KNoT id can call an event
-        const deviceMapped = mapDevice(device);
-        callback(deviceMapped);
-      }
-    });
+    if (event === 'config') {
+      this.connection.on(event, (device) => {
+        if (_.has(device, 'id')) { // Just device with KNoT id can call an event
+          const deviceMapped = mapDevice(device);
+          callback(deviceMapped);
+        }
+      });
+    } else if (event === 'message') {
+      this.connection.on(event, async (msg) => {
+        const devices = await getMyDevices(this.connection, this.uuid);
+        const deviceFound = _.find(devices, dev => dev.uuid === msg.fromUuid);
+
+        _.set(msg, 'fromId', deviceFound.id);
+        callback(_.pick(msg, ['payload', 'fromId']));
+      });
+    }
   }
 }
 
