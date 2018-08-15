@@ -10,6 +10,9 @@ import UpdateDevices from 'interactors/UpdateDevices';
 import LoadDevices from 'interactors/LoadDevices';
 import UpdateChanges from 'interactors/UpdateChanges';
 import DevicesService from 'services/DevicesService';
+import UpdateData from 'interactors/UpdateData';
+import DataService from 'services/DataService';
+import PublishData from 'interactors/PublishData';
 
 const settings = new Settings();
 const deviceStore = new DeviceStore();
@@ -41,12 +44,23 @@ async function main() {
     const loadDevices = new LoadDevices(deviceStore, cloud, fog);
     const updateChanges = new UpdateChanges(deviceStore, cloud);
     const devicesService = new DevicesService(updateDevices, loadDevices, updateChanges);
+    const publishData = new PublishData(cloud);
+    const updateData = new UpdateData(fog);
+    const dataService = new DataService(updateData, publishData);
 
     await devicesService.load();
 
     await fog.on('config', async (device) => {
       try {
         await devicesService.updateChanges(device);
+      } catch (err) {
+        console.error(err);
+      }
+    });
+
+    await fog.on('message', async (msg) => {
+      try {
+        await dataService.publish(msg.fromId, msg.payload);
       } catch (err) {
         console.error(err);
       }
