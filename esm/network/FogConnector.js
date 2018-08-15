@@ -46,7 +46,7 @@ function getMyDevices(connection, uuid) {
         return reject(result.error);
       }
 
-      resolve(result);
+      return resolve(result);
     });
   });
 }
