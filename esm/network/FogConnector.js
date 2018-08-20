@@ -13,7 +13,7 @@ function createConnection(hostname, port, uuid, token) {
 }
 
 function connect(hostname, port, uuid, token) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const connection = createConnection(hostname, port, uuid, token);
 
     connection.on('ready', () => {
@@ -21,8 +21,13 @@ function connect(hostname, port, uuid, token) {
     });
 
     connection.on('notReady', () => {
-      connection.close(() => {});
-      reject(new Error('Connection not authorized'));
+      console.error('Connection failure! Trying to reconnect.');
+      connection.reconnect();
+    });
+
+    connection.on('disconnect', () => {
+      console.error('Socket Disconnected! Trying to reconnect.');
+      connection.reconnect();
     });
   });
 }
