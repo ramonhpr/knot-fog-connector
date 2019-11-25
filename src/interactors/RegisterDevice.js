@@ -13,10 +13,18 @@ class RegisterDevice {
       id,
       name,
     };
+    let msgResponse;
 
-    const registeredDevice = await this.cloudConnector.addDevice(deviceToBeSaved);
-    await this.deviceStore.add(deviceToBeSaved);
-    await this.queue.sendRegisteredDevice(registeredDevice);
+    try {
+      msgResponse = await this.cloudConnector.addDevice(deviceToBeSaved);
+      msgResponse.error = null;
+      await this.deviceStore.add(deviceToBeSaved);
+    } catch (error) {
+      logger.error(error.message);
+      msgResponse = { id, token: '', error: error.message };
+    }
+
+    await this.queue.sendRegisteredDevice(msgResponse);
   }
 }
 
