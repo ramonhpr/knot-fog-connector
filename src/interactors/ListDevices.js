@@ -7,12 +7,19 @@ class ListDevices {
   }
 
   async execute() {
-    const devices = await this.cloudConnector.listDevices();
-    await this.queue.sendList(devices.map((dev) => {
-      const device = dev;
-      device.schema = convertToSnakeCase(dev.schema);
-      return device;
-    }));
+    try {
+      const devices = await this.cloudConnector.listDevices();
+      await this.queue.sendList({
+        devices: devices.map((dev) => {
+          const device = dev;
+          device.schema = convertToSnakeCase(dev.schema);
+          return device;
+        }),
+        error: null,
+      });
+    } catch (error) {
+      await this.queue.sendList({ devices: [], error: error.message });
+    }
   }
 }
 
