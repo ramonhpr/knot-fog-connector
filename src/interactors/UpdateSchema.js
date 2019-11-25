@@ -12,10 +12,10 @@ class UpdateSchema {
     try {
       await this.cloudConnector.updateSchema(device.id, convertToCamelCase(device.schema));
       await this.deviceStore.update(device.id, { schema: convertToCamelCase(device.schema) });
-      this.queue.send('fog', 'schema.updated', { id: device.id, error: null });
+      this.queue.sendSchemaUpdated({ id: device.id, error: null });
       logger.debug(`Device ${device.id} schema updated`);
     } catch (error) {
-      this.queue.send('fog', 'schema.updated', { id: device.id, error: error.message });
+      this.queue.sendSchemaUpdated({ id: device.id, error: error.message });
     }
   }
 }
